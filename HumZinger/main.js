@@ -2,7 +2,7 @@ var gameInterval;
 var gameCanvas;
 var eventCatcherDiv;
 
-var scaleFactor = 3
+var scaleFactor = 4
 
 var imageList = [
     {name:"hummingBird",
@@ -12,6 +12,9 @@ var imageList = [
 ]
 
 var allImages = [];
+
+birdX = -200;
+birdY = -200;
 
 function preloader()
 {
@@ -33,10 +36,17 @@ function loadImage(imageName){
     return imgVar;
 }
 
+function mouseMove(E){
+    E = E || window.event;
+    birdX = E.pageX * scaleFactor - 200
+    birdY = E.pageY * scaleFactor - 200
+}
+
 function startLoading()
 {
     eventCatcherDiv = document.getElementById("EventCatcher");
     // eventCatcherDiv events go here
+    eventCatcherDiv.addEventListener("mousemove", mouseMove)
 
     gameCanvasObj = document.getElementById("GraphicsBox")
     gameCanvas = gameCanvasObj.getContext("2d");
@@ -47,7 +57,6 @@ function startLoading()
 }
 
 function isEverythingLoaded(){
-    console.log("Testing")
     for(var i = 0; i < allImages.length; i++){
         for(var j = 0; j < allImages[i].length; j++){
             if(!allImages[i][j].complete) return false
@@ -61,7 +70,6 @@ function hasLoaded()
     if (isEverythingLoaded()) // Check to see if all info is loaded
     {
         clearInterval(gameInterval);
-        console.log(allImages)
         startGame();
     }
 }
@@ -76,8 +84,7 @@ function runGame()
 {
     gameCanvas.clearRect(0,0,gameCanvasObj.width * scaleFactor, gameCanvasObj.height * scaleFactor)
     currentFrame = Math.floor((Date.now() - gameStartTime)/25)
-    console.log(currentFrame)
-    drawBird(gameCanvas, 200, 200, currentFrame)
+    drawBird(gameCanvas, birdX, birdY, currentFrame)
 }
 
 function drawBird(g, x, y, f){
