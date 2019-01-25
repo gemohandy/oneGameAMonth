@@ -15,7 +15,11 @@ var imageList = [
     leadingZeros:4,
     frameCount:6,
     fileExtension:".png"
-    }
+    },
+    {name:"heart",
+    leadingZeros:4,
+    frameCount:4,
+    fileExtension:".png"}
 ]
 
 var allImages = [];
@@ -122,18 +126,19 @@ objects = [];
 
 function readyObjects(){
     for(var i = 0; i < 20; i++){
-        objects.push(new bee(20 * i, 200, [-10,0], gameCanvasObj))
-        objects.push(new bee(20 * i, 400, [-10,0], gameCanvasObj))
-        objects.push(new bee(20 * i, 600, [-10,0], gameCanvasObj))
+        objects.push(new bee(20 * i, 800, [-2,-8], gameCanvasObj))
+        objects.push(new bee(20 * i, 800, [-5,-5], gameCanvasObj))
+        objects.push(new bee(20 * i, 800, [-8,-2], gameCanvasObj))
         objects.push(new bee(20 * i, 800, [-10,0], gameCanvasObj))
-        objects.push(new bee(20 * i, 1000, [-10,0], gameCanvasObj))
-        objects.push(new bee(20 * i, 1200, [-10,0], gameCanvasObj))
-        objects.push(new bee(20 * i, 1400, [-10,0], gameCanvasObj))
+        objects.push(new bee(20 * i, 800, [-8,2], gameCanvasObj))
+        objects.push(new bee(20 * i, 800, [-5,5], gameCanvasObj))
+        objects.push(new bee(20 * i, 800, [-2,8], gameCanvasObj))
     }
 }
 
 function startGame()
 {
+    document.getElementById("BackgroundBox").style.cursor = "none"
     gameStartTime = Date.now()
     lives = maxLives;
     gameInterval = setInterval(runGame, 25);
@@ -154,11 +159,22 @@ function runGame()
     if(lives < 0){
         clearInterval(gameInterval);
     }
+    else{
+        for(var i = 0; i < lives; i++){
+            drawHeart(gameCanvas, 200*i + 50, currentFrame)
+        }
+    }
 }
 
 function drawBird(g, x, y, f){
     //The bird is the first element in the imageList - all the information we need is in there.
     //Note - drawing the bird centered at x and y, rather than at the corner. That way, the same values can be used in collision detection.
     drawFrame = f % imageList[0].frameCount;
-    g.drawImage(allImages[0][drawFrame], x - 200, y - 200)
+    g.drawImage(allImages[0][drawFrame], x - 150, y - 150)
+}
+
+function drawHeart(g, x, f){
+    //The heart is the third element in the imageList, and all hearts will be placed at the same vertical position.
+    drawFrame = f % imageList[2].frameCount;
+    g.drawImage(allImages[2][drawFrame], x, 50)
 }
