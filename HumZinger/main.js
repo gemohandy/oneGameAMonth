@@ -28,11 +28,12 @@ birdX = -200;
 birdY = -200;
 
 class movingThing {
-    constructor(startFrame, startY, movementVector, g){
+    constructor(startFrame, startY, movementVector, g, r){
         this.startFrame = startFrame;
         this.startY = startY;
         this.startX = g.width * scaleFactor;
         this.movementVector = movementVector;
+        this.hitBoxRadius = r;
     }
     findPosition(frame, g){
         if(frame < this.startFrame){
@@ -48,7 +49,12 @@ class movingThing {
     }
 }
 
+lastHitFrame = 0;
+
 class bee extends movingThing{
+    constructor(startFrame, startY, movementVector, g){
+        super(startFrame, startY, movementVector, g, 50);
+    }
     draw(frame, g, overG){
         //bumblebee images are second in the image list.
         var coordinates = this.findPosition(frame, overG);
@@ -58,8 +64,15 @@ class bee extends movingThing{
         g.drawImage(allImages[1][frame%4], coordinates[0], coordinates[1])
         return true;
     }
-    onCollide(){
-        lives--
+    findCenter(frame){
+        var coordinates = this.findPosition(frame);
+        return [coordinates[0]+35, coordinates[1]+25]
+    }
+    onCollide(currentFrame){
+        if(lastHitFrame + 25 < currentFrame){
+            lives--;
+            lastHitFrame = currentFrame;
+        }
     }
 }
 
@@ -144,10 +157,15 @@ function startGame()
     gameInterval = setInterval(runGame, 25);
 }
 
+function dist(pair1, pair2){
+    diff = [pair1[0]-pair2[0], pair1[1] - pair2[1]]
+    return Math.sqrt(diff[0]*diff[0] + diff[1]* diff[1])
+}
+
 function runGame()
 {
     gameCanvas.clearRect(0,0,gameCanvasObj.width * scaleFactor, gameCanvasObj.height * scaleFactor)
-    currentFrame = Math.floor((Date.now() - gameStartTime)/25)
+    currentFrame = Math.floor((Date.now() - gameStartTime)/40)
     drawBird(gameCanvas, birdX, birdY, currentFrame)
     objectsToDelete = [];
     for(i = 0; i < objects.length; i++){
@@ -156,7 +174,14 @@ function runGame()
         }
     }
     objectsToDelete.reverse().forEach(function(index){objects.splice(index, 1)})
-    if(lives < 0){
+    //Test for Collisions with all existing objects)
+    for(i = 0; i < objects.length; i++){
+        if(dist(objects[i].findCenter(currentFrame), [birdX, birdY]) < objects[i].hitBoxRadius + 75){
+            objects[i].onCollide(currentFrame);
+        }
+    }
+
+    if(lives <= 0){
         clearInterval(gameInterval);
     }
     else{
@@ -169,8 +194,16 @@ function runGame()
 function drawBird(g, x, y, f){
     //The bird is the first element in the imageList - all the information we need is in there.
     //Note - drawing the bird centered at x and y, rather than at the corner. That way, the same values can be used in collision detection.
+    //Adding a circle behind the bird for the hitbox.
+    g.beginPath()
+    g.lineWidth = 20;
+    g.strokeStyle = "#1111FF";
+    g.ellipse(x, y, 75, 75, 0, 0, Math.PI * 2)
+    g.stroke();
+    g.closePath()
+    console.log(g)
     drawFrame = f % imageList[0].frameCount;
-    g.drawImage(allImages[0][drawFrame], x - 150, y - 150)
+    g.drawImage(allImages[0][drawFrame], x - 150, y - 125)
 }
 
 function drawHeart(g, x, f){
