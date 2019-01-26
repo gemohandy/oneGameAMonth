@@ -58,7 +58,7 @@ class bee extends movingThing{
     draw(frame, g, overG){
         //bumblebee images are second in the image list.
         var coordinates = this.findPosition(frame, overG);
-        if(coordinates[0] < -70 || coordinates[1] < 50 || coordinates[1] > g.height * scaleFactor + 50){
+        if(coordinates[0] < -70 || coordinates[1] < -50 || coordinates[1] > g.height * scaleFactor + 50){
             return false;
         }
         g.drawImage(allImages[1][frame%4], coordinates[0], coordinates[1])
@@ -166,7 +166,9 @@ function runGame()
 {
     gameCanvas.clearRect(0,0,gameCanvasObj.width * scaleFactor, gameCanvasObj.height * scaleFactor)
     currentFrame = Math.floor((Date.now() - gameStartTime)/40)
-    drawBird(gameCanvas, birdX, birdY, currentFrame)
+    if(currentFrame % 3 != 0 || lastHitFrame + 25 < currentFrame){
+        drawBird(gameCanvas, birdX, birdY, currentFrame)
+    }
     objectsToDelete = [];
     for(i = 0; i < objects.length; i++){
         if(!objects[i].draw(currentFrame, gameCanvas, gameCanvasObj)){
