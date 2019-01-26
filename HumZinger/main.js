@@ -201,7 +201,6 @@ function drawBird(g, x, y, f){
     g.ellipse(x, y, 75, 75, 0, 0, Math.PI * 2)
     g.stroke();
     g.closePath()
-    console.log(g)
     drawFrame = f % imageList[0].frameCount;
     g.drawImage(allImages[0][drawFrame], x - 150, y - 125)
 }
